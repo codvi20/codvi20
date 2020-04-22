@@ -42,7 +42,10 @@ Information of "who" were in proximity is stored, hashed to avoid impersonation,
 in each device, since it's for the benefit of the owner to have an early
 diagnostic and treatment.
 
-Servers do not store the information for more than a short period of time. 
+The servers do not store the information for more than a short period of time. 
+
+The devices store the information only for some days. 14 days makes sense as its the consensus incubation period, but it may change if the consensus changes.
+
 There is no record of the activity of the users.
 
 There is a list of potential risks and the countermeasures [here](risk-and-measures.md).
