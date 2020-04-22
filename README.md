@@ -45,4 +45,4 @@ diagnostic and treatment.
 Servers do not store the information for more than a short period of time.
 There is no record of the activity of the users.
 
-There is a list of potential risks and the countermeasures [here][risk-and-measures.md].
+There is a list of potential risks and the countermeasures [here](risk-and-measures.md).
