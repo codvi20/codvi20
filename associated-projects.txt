@@ -1,0 +1,16 @@
+Add to this list the following information of your project if it's
+based in any way in this:
+
+1.- One email and name to identify the author or authors
+2.- The name and way to locate the project
+
+Follow this example, adding your info belowe the lines:
+    
+Author: someone@somewhere.com - John F. Smith, Univ. of Lisbon, Portugal
+Project: Just an Example, www.someurl.com/justanexample
+
+And create a pull request
+
+Thanks.
+
+--------------------------------------------
