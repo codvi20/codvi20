@@ -15,7 +15,7 @@ You can copy, distribute, use to inspirate your own creation, implement
 or do whatever you may want with the information here contained, with 
 ONLY TWO CONDITIONS: 
   1. you need to need to make an explicit reference to this project and the authors.
-  2. you have to create a pull request in which you identify yourself and th email and name your project in a clear way in the file "associated-projects.txt"
+  1. you have to create a pull request in which you identify yourself and th email and name your project in a clear way in the file "associated-projects.txt"
 
 # Brief description
 Each has an instance of the app in their device.
