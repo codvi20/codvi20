@@ -12,15 +12,12 @@ proximity.
 The user might store these values and hack the system notifying fake coords
 to confuse the system:
 
-    ```sh
     {one-of-the-received-ids-hashed, another-coords-hashed}
-    ```
 
 ### Countermeasure
 The server will answer with the hashed id again in the following way:
-    ```sh
+
     hash( hashed-id + serverSequence )
-    ```
 
 When the infection is detected, the hashed id sent by the authority is 
 rehashed by each server with its sequence.
