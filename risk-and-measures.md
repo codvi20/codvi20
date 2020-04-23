@@ -11,7 +11,7 @@ proximity.
 
 The user might store these values and hack the system notifying fake coords
 to confuse the system:
-   ```sh
+    ```sh
     {one-of-the-received-ids-hashed, another-coords-hashed}
     ```
 
