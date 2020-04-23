@@ -11,13 +11,14 @@ proximity.
 
 The user might store these values and hack the system notifying fake coords
 to confuse the system:
+
     ```sh
     {one-of-the-received-ids-hashed, another-coords-hashed}
     ```
 
 ### Countermeasure
 The server will answer with the hashed id again in the following way:
-   ```sh
+    ```sh
     hash( hashed-id + serverSequence )
     ```
 
