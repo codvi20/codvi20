@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <title>Hello, world!</title>
+
+    <script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    document.getElementById("demo").innerHTML="Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+   document.getElementById("demo").innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
+}
+
+
+
+function storeLocalChain() {
+    if(window.localStorage) {
+        let x = window.localStorage.getItem("chain");
+        if(x==null) {
+            x = "a";
+        } else {
+            x += "a";
+        }
+        window.localStorage.setItem("chain", x);
+        document.getElementById("demo").innerHTML="Stored value : " + x;
+    } else {
+         document.getElementById("demo").innerHTML="Local Storage Not Supported";
+    }
+}
+
+
+function sendGeoInfo() {
+    const userAction = async () => {
+        const response = await fetch('https://codvi20.oa.r.appspot.com/example.json', {
+            method: 'POST',
+            body: {
+                gps: 5554,
+                id: 111
+              },
+            headers: {
+               'Content-Type': 'application/json'
+            }
+        });
+        const myJson = await response.json(); 
+        document.getElementById("demo").innerHTML=JSON.stringify(myJson);
+    };
+    userAction();
+}
+    </script>
+  </head>
+
+
+  <body>
+    <p>
+    Freedom for Spain!
+    </p>
+    <div id="demo">
+    </div>
+
+    <button onclick="getLocation()">gps</button>
+    <br/>
+    <button onclick="storeLocalChain()">localchain</button>
+    <br/>
+    <button onclick="sendGeoInfo()">send geolocation</button>
+  </body>
+</html>
