@@ -8,22 +8,24 @@ const LAPSE = 10000; // 10 seconds
 const geoPos = {};
 
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({type: '*/json'}));
 
+// For debuugging
+app.post('/echo', (req, res) => {
+  res.json({ echo : req.headers, body: req.body});
+});
 
+// For justice and freedom
 app.get('/about', (req, res) => {
   res.send('Freedom in Spain now! Stop the coup d\'etat.');
 });
 
+// For asking for neighbors
 app.post('/geopos', (req, res) => {
   const hashedGps = req.body.gps;
   const hashedId = req.body.id;
   const now = Date.now();
   const minTime = now - LAPSE;
-
-  console.log("MIN TIME = " + minTime);
-  console.log("NOW = " + now);
 
   let samePlacers = geoPos[hashedGps];
   if(samePlacers===undefined) {
