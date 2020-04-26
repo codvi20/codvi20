@@ -1,9 +1,4 @@
-/*
- * External functions and utilitiies inside the device to deal with Hashes
- */
-
-module.exports = {
-sha1: function(str) {
+sha1 = function(str) {
   //  discuss at: http://phpjs.org/functions/sha1/
   // original by: Webtoolkit.info (http://www.webtoolkit.info/)
   // improved by: Michael White (http://getsprink.com)
@@ -134,4 +129,8 @@ sha1: function(str) {
   temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
   return temp.toLowerCase();
 }
-};
+
+var module;
+if(module!==undefined) {
+  module.exports.sha1 = sha1;
+}

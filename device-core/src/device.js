@@ -1,33 +1,57 @@
-const sha1 = require('./sha1.js').sha1;
-const myId = 111;
-const MAX_HISTORY = 1000 * 3600 * 24 * 10; // 1000ms x seconds/h x h x days
-const MIN_MATCHES = 4;  // 2 times with someone infected to consider in risk
-
-
 //
 // Previous usage. Define the following functions:
 //    * localStorage() to return window.localStorage
 //    * geoLocation() to return navigator.geolocation
 //    * fetch() to fetch in browser
-module.exports = function(localStorage, geoLocation, fetch) {
+var Device = function(localStorage, geoLocation, fetch) {
+  this.localStorage = localStorage;
+  this.geoLocation = geoLocation;
+  this.fetch = fetch;
+
+  this.MY_ID = 0;
+  this.MIN_MATCHES = 0;
+  this.MAX_HISTORY = 0;
+  this.GPS_RESOLUTION = 0;
+
+   this.initMemory();
+};
+
+/**
+ * Set and get my id.
+ */
+Device.prototype.setMyId = (myId) => this.MY_ID !== undefined ? this.MY_ID = myId : this.MY_ID;
+Device.prototype.getMyId = () => this.MY_ID;
+
+
+  /**
+   * Set min infection matches.
+   */
+Device.prototype.setMinInfectionMatches = minMatches => this.MIN_MATCHES = minMatches;
+
+  /**
+   * Set history of matches to remember.
+   */
+Device.prototype.setHistory = days => this.MAX_HISTORY = 1000*3600*days;
+
+
   /**
    * Sends geoposition to server asking for neighbors.
    * param: hashDeviceId = id of the device hashed
    */
-  module.sendGeoInfo = function(hashDeviceId) {
-    geoLocation().getCurrentPosition(async (position) => {
+Device.prototype.sendGeoInfo = function() {
+    this.geoLocation().getCurrentPosition(async (position) => {
       const hashPosition = sha1(position.coords.latitude + "," 
           + position.coords.longitude);
       try {
-        const response = await fetch('https://codvi20.oa.r.appspot.com/geopos',{
+        const response = await this.fetch('https://codvi20.oa.r.appspot.com/geopos',{
             method: 'post',
             headers: { "Content-Type": "text/json" },  
                     // Type application/json does not work in WebView ?
-            body: JSON.stringify({ gps: hashPosition, id: hashDeviceId })
+            body: JSON.stringify({ gps: hashPosition, id: this.getMyId() })
         });
         const myJson = await response.json();
         
-        storeAnswer(myJson.nearIds);
+        this.storeAnswer(myJson.nearIds);
       } catch(e) {
         //notifyError(e);
         console.log(e);
@@ -39,17 +63,17 @@ module.exports = function(localStorage, geoLocation, fetch) {
   /**
    * Asks to server for infections related to my hashId.
    */
-  module.askForInfection = async function(hashDeviceId, minMatches) {
+Device.prototype.askForInfection = async function() {
     try {
-      const response=await fetch('https://codvi20.oa.r.appspot.com/infection',{
+      const response=await this.fetch('https://codvi20.oa.r.appspot.com/infection',{
             method: 'post',
             headers: { "Content-Type": "text/json" },  
                     // Type application/json does not work in WebView ?
-            body: JSON.stringify({ id: hashDeviceId })
+            body: JSON.stringify({ id: this.getMyId() })
       });
       const myJson = await response.json();
       
-      return checkForInfection(myJson.infectedIds, minMatches);
+      return this.checkForInfection(myJson.infectedIds, this.MIN_MATCHES);
     } catch(e) {
       //notifyError(e);
        console.log(e);
@@ -65,14 +89,14 @@ module.exports = function(localStorage, geoLocation, fetch) {
   /**
    * Initialize memory and purges old elements.
    */
-  let initMemory = function initMemory() {
-    let memory = localStorage().getItem("chain");
+Device.prototype.initMemory = function initMemory() {
+    let memory = this.localStorage().getItem("chain");
     if(memory===undefined) {
       memory = new Map();
     } else {
-      clearMemory(memory, MAX_HISTORY);
+      this.clearMemory(memory, this.MAX_HISTORY);
     }
-    localStorage().setItem("chain", memory);
+    this.localStorage().setItem("chain", memory);
   };
 
 
@@ -85,7 +109,7 @@ module.exports = function(localStorage, geoLocation, fetch) {
    *            This map will be affected!
    *    maxHistory: limit of time in past in milliseconds from now to preserve
    */
-  const clearMemory = function(memory, maxHistory) {
+ Device.prototype.clearMemory = function(memory, maxHistory) {
     const miHhistoryTime = Date.now()-maxHistory;
     for(const x of memory.entries()) {
       if(x[0] < maxHistory) {
@@ -99,22 +123,22 @@ module.exports = function(localStorage, geoLocation, fetch) {
 
 
 
-
   /*
    * Stores in local storage the list of near devices.
    * params:
    *    nearIds : an array of { "id", "time" } structure with ids of near ids
    *              and the notification time
    */
-  function storeAnswer(nearIds) {
+Device.prototype.storeAnswer =  function(nearIds) {
     // Filter yourself, the server does not do it (or maybe yes, but who knows)
-    let v = nearIds.filter(info => info.id !== myId).map(info => info.id);
+    let v = nearIds.filter(info => 
+        info.id !== this.getMyId()).map(info => info.id);
 
     if(v.length > 0) {
-      let memory = localStorage().getItem("chain");
-      clearMemory(memory, MAX_HISTORY);
+      let memory = this.localStorage().getItem("chain");
+      this.clearMemory(memory, this.MAX_HISTORY);
       memory.set(Date.now(),  v);
-      localStorage().setItem("chain", memory);
+      this.localStorage().setItem("chain", memory);
     }
   }
 
@@ -125,10 +149,9 @@ module.exports = function(localStorage, geoLocation, fetch) {
    *    infectedIds : and array of ["hashId"] with infected ids.
    *    minMatches : minimum of matches with an infected id to consider a match.
    */
-
-  function checkForInfection(infectedIds, minMatches) {
-    let memory = localStorage().getItem("chain");
-    clearMemory(memory, MAX_HISTORY);
+Device.prototype.checkForInfection = function(infectedIds, minMatches) {
+    let memory = this.localStorage().getItem("chain");
+    this.clearMemory(memory, this.MAX_HISTORY);
     let matchDone = false;
     let matches = 0;
     outter: for(const arr of memory.entries()) {
@@ -141,12 +164,15 @@ module.exports = function(localStorage, geoLocation, fetch) {
       }
     }
     return matches>minMatches;
-  }
+  };
 
 
-  initMemory();
 
-  return module;
-};
+var require;
+if(require!==undefined) {
+  const sha1 = require('./sha1.js').sha1;
+  module.exports.Device = Device;
+}
+
 
 
