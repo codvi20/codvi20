@@ -4,14 +4,15 @@ const bodyParser = require('body-parser')
 
 
 // Milliseconds to keep in memory ids in the same geoposition
-const LAPSE = 10000; // 10 seconds
+const LAPSE = 10000; // 10 seconds. Why? Because there are 10 types of
+                     // humans: those who know binary and those who don't
 const geoPos = {};
 
 
 app.use(bodyParser.json({type: '*/json'}));
 
 // For debuugging
-app.post('/echo', (req, res) => {
+app.all('/echo', (req, res) => {
   res.json({ echo : req.headers, body: req.body});
 });
 
@@ -21,6 +22,7 @@ app.get('/about', (req, res) => {
 });
 
 // For asking for neighbors
+// response: a json with : { "nearIds" : [ array of { "id", "time" } ] }
 app.post('/geopos', (req, res) => {
   const hashedGps = req.body.gps;
   const hashedId = req.body.id;
