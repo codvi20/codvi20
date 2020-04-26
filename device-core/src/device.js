@@ -109,7 +109,8 @@ Device.prototype.initMemory = function initMemory() {
    *            This map will be affected!
    *    maxHistory: limit of time in past in milliseconds from now to preserve
    */
- Device.prototype.clearMemory = function(memory, maxHistory) {
+Device.prototype.clearMemory = function(memory, maxHistory) {
+  try {
     const miHhistoryTime = Date.now()-maxHistory;
     for(const x of memory.entries()) {
       if(x[0] < maxHistory) {
@@ -119,7 +120,10 @@ Device.prototype.initMemory = function initMemory() {
         break;
      }
     }
-  };
+  } catch(e) {
+    return;
+  }
+};
 
 
 
