@@ -71,3 +71,6 @@ See `app/src/main/assets/www/index.html` for the Main single page of the
 application. It's loaded in a WebView in file
 `app/src/main/java/com/codvi20/android/MainActivity.java`. And that's all our
 knowledge on mobile apps, sorry.
+
+Before building Android project, you need to deploy JavaScript files
+under `device-core/src`. The `deploy-into-andorid.sh` does this.
