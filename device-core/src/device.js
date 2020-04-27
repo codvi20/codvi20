@@ -11,7 +11,7 @@ var Device = function(localStorage, geoLocation, fetch) {
   this.MY_ID = 0;
   this.MIN_MATCHES = 0;
   this.MAX_HISTORY = 0;
-  this.GPS_RESOLUTION = 0;
+  this.GPS_RESOLUTION = 0.01;
 
    this.initMemory();
 };
@@ -39,33 +39,42 @@ Device.prototype.setHistory = days => this.MAX_HISTORY = 1000*3600*days;
    * param: hashDeviceId = id of the device hashed
    */
 Device.prototype.sendGeoInfo = function() {
-    this.geoLocation().getCurrentPosition(async (position) => {
-      const hashPosition = sha1(position.coords.latitude + "," 
-          + position.coords.longitude);
-      try {
-        const response = await this.fetch('https://codvi20.oa.r.appspot.com/geopos',{
+  this.geoLocation().getCurrentPosition((position) => {
+      const latitude=Math.round(position.coords.latitude / this.GPS_RESOLUTION) 
+              * this.GPS_RESOLUTION;
+      const longitude=Math.round(position.coords.longitude/this.GPS_RESOLUTION) 
+              * this.GPS_RESOLUTION;
+      const that = this;              
+      for(const vars of [[0,0],[this.GPS_RESOLUTION,0],[-this.GPS_RESOLUTION,0],
+          [0,this.GPS_RESOLUTION],[0,-this.GPS_RESOLUTION]]) {
+        const hashPosition=sha1((latitude+vars[0]) + "," + (longitude+vars[1]));
+        this.fetch(
+          'https://codvi20.oa.r.appspot.com/geopos', {
             method: 'post',
             headers: { "Content-Type": "text/json" },  
                     // Type application/json does not work in WebView ?
             body: JSON.stringify({ gps: hashPosition, id: this.getMyId() })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(myJson) {
+            that.storeAnswer(myJson.nearIds);
         });
-        const myJson = await response.json();
-        
-        this.storeAnswer(myJson.nearIds);
-      } catch(e) {
-        //notifyError(e);
-        console.log(e);
       }
-    });
-  };
+  }, (error) => console.log(error), {
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 0
+  });
+};
 
 
-  /**
-   * Asks to server for infections related to my hashId.
-   */
+/**
+ * Asks to server for infections related to my hashId.
+ */
 Device.prototype.askForInfection = async function() {
     try {
-      const response=await this.fetch('https://codvi20.oa.r.appspot.com/infection',{
+      const response=await 
+        this.fetch('https://codvi20.oa.r.appspot.com/infection',{
             method: 'post',
             headers: { "Content-Type": "text/json" },  
                     // Type application/json does not work in WebView ?
@@ -83,32 +92,32 @@ Device.prototype.askForInfection = async function() {
 
 
 
-  /////// INNER FUNCTIONS ----------------
-  //
+/////// INNER FUNCTIONS ----------------
+//
 
-  /**
-   * Initialize memory and purges old elements.
-   */
+/**
+ * Initialize memory and purges old elements.
+ */
 Device.prototype.initMemory = function initMemory() {
-    let memory = this.localStorage().getItem("chain");
-    if(memory===undefined) {
-      memory = new Map();
-    } else {
-      this.clearMemory(memory, this.MAX_HISTORY);
-    }
-    this.localStorage().setItem("chain", memory);
-  };
+  let memory = this.localStorage().getItem("chain");
+  if(memory===undefined) {
+    memory = new Map();
+  } else {
+    this.clearMemory(memory, this.MAX_HISTORY);
+  }
+  this.localStorage().setItem("chain", memory);
+};
 
 
 
 
-  /*
-   * Clear memory of oldest entries.
-   * param:
-   *    memory: a Map of millis -> entry
-   *            This map will be affected!
-   *    maxHistory: limit of time in past in milliseconds from now to preserve
-   */
+/*
+ * Clear memory of oldest entries.
+ * param:
+ *    memory: a Map of millis -> entry
+ *            This map will be affected!
+ *    maxHistory: limit of time in past in milliseconds from now to preserve
+ */
 Device.prototype.clearMemory = function(memory, maxHistory) {
   try {
     const miHhistoryTime = Date.now()-maxHistory;
@@ -127,48 +136,48 @@ Device.prototype.clearMemory = function(memory, maxHistory) {
 
 
 
-  /*
-   * Stores in local storage the list of near devices.
-   * params:
-   *    nearIds : an array of { "id", "time" } structure with ids of near ids
-   *              and the notification time
-   */
+/*
+ * Stores in local storage the list of near devices.
+ * params:
+ *    nearIds : an array of { "id", "time" } structure with ids of near ids
+ *              and the notification time
+ */
 Device.prototype.storeAnswer =  function(nearIds) {
-    // Filter yourself, the server does not do it (or maybe yes, but who knows)
-    let v = nearIds.filter(info => 
-        info.id !== this.getMyId()).map(info => info.id);
+  // Filter yourself, the server does not do it (or maybe yes, but who knows)
+  let v = nearIds.filter(info => 
+      info.id !== this.getMyId()).map(info => info.id);
 
-    if(v.length > 0) {
-      let memory = this.localStorage().getItem("chain");
-      this.clearMemory(memory, this.MAX_HISTORY);
-      memory.set(Date.now(),  v);
-      this.localStorage().setItem("chain", memory);
-    }
-  }
-
-
-  /*
-   * Checks in memory if there is match with infected reported ids.
-   * params:
-   *    infectedIds : and array of ["hashId"] with infected ids.
-   *    minMatches : minimum of matches with an infected id to consider a match.
-   */
-Device.prototype.checkForInfection = function(infectedIds, minMatches) {
+  if(v.length > 0) {
     let memory = this.localStorage().getItem("chain");
     this.clearMemory(memory, this.MAX_HISTORY);
-    let matchDone = false;
-    let matches = 0;
-    outter: for(const arr of memory.entries()) {
-      for(const neighbourId of arr[1]) {
-        matches += infectedIds.reduce(
-              (accum, id) => accum += id===neighbourId ? 1 : 0, 0);
-        if(matches>minMatches) {
-          break outter;
-        }
+    memory.set(Date.now(),  v);
+    this.localStorage().setItem("chain", memory);
+  }
+}
+
+
+/*
+ * Checks in memory if there is match with infected reported ids.
+ * params:
+ *    infectedIds : and array of ["hashId"] with infected ids.
+ *    minMatches : minimum of matches with an infected id to consider a match.
+ */
+Device.prototype.checkForInfection = function(infectedIds, minMatches) {
+  let memory = this.localStorage().getItem("chain");
+  this.clearMemory(memory, this.MAX_HISTORY);
+  let matchDone = false;
+  let matches = 0;
+  outter: for(const arr of memory.entries()) {
+    for(const neighbourId of arr[1]) {
+      matches += infectedIds.reduce(
+            (accum, id) => accum += id===neighbourId ? 1 : 0, 0);
+      if(matches>minMatches) {
+        break outter;
       }
     }
-    return matches>minMatches;
-  };
+  }
+  return matches>minMatches;
+};
 
 
 
