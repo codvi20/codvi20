@@ -49,3 +49,25 @@ The devices store the information only for some days. 14 days makes sense as its
 There is no record of the activity of the users.
 
 There is a list of potential risks and the countermeasures [here](risk-and-measures.md).
+
+
+## Code structure - to readers
+### The device side
+In `device-core` you can find two folders: `src` where the Javascript with de ide logic is, and `test` where some tests try to execute the code in a simple way.
+
+### The server side
+We've created a simple demo for the server to be deployed in Google Cloud.
+
+Under `gcloud` folder, the stuff for server side is present.
+
+The most important file is `server.js`, a simple implementation of server side 
+functionallity based in express.
+
+### The Android specific wrapper
+Under `android` folder we've placed the Android SDK project.
+It's an hypbrid application that wrapps Javascript in an index.html specific
+for Android.
+See `app/src/main/assets/www/index.html` for the Main single page of the
+application. It's loaded in a WebView in file
+`app/src/main/java/com/codvi20/android/MainActivity.java`. And that's all our
+knowledge on mobile apps, sorry.
