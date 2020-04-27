@@ -1,50 +1,69 @@
 <html>
   <head>
     <title>Hello, world!</title>
-
+    <script src="sha1.js"></script>
+    <script src="device.js"></script>
     <script>
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    document.getElementById("demo").innerHTML="Geolocation is not supported by this browser.";
-  }
-}
+      var device = new Device(() => window.localStorage, () => navigator.geolocation, window.fetch.bind(window));
 
-function showPosition(position) {
-   document.getElementById("demo").innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
-}
+      function setValues() {
+        let deviceId = document.getElementById("deviceId").value;
+        let minMatches = document.getElementById("minMatches").value;
+        let maxHistory = document.getElementById("maxHistory").value;
+        device.setMyId(deviceId);
+        device.setMinInfectionMatches(minMatches);
+        device.setHistory(maxHistory);
+        document.getElementById("msg").innerHTML = "Values set";
+      }
 
-
-
-function storeLocalChain() {
-    if(window.localStorage) {
-        let x = window.localStorage.getItem("chain");
-        if(x==null) {
-            x = "a";
-        } else {
-            x += "a";
+      function showLocalMemory() {
+        document.getElementById("msg").innerHTML = window.localStorage.getItem("chain");
+        for(x in window.localStorage.getItem("chain").elements()) {
+          document.getElementById("msg").innerHTML += "<br/>" + x[0] + "," + x[1];
         }
-        window.localStorage.setItem("chain", x);
-        document.getElementById("demo").innerHTML="Stored value : " + x;
-    } else {
-         document.getElementById("demo").innerHTML="Local Storage Not Supported";
-    }
-}
+        docuemnt.getElementById("msg").innerHTML += "<br/>thats all";
+      }
+
+      function clearLocalMemory() {
+        window.localStorage.setItem("chain", new Map());
+      }
+
+      function sendGeoInfo() { device.sendGeoInfo(); }
 
 
+      function echo() {
+        document.getElementById("msg").innerHTML = "echoing...";
+        fetch('https://codvi20.oa.r.appspot.com/echo', { method: 'post'})
+            .then(function(response) {
+              document.getElementById("msg").innerHTML += "A";
+              return response.json();
+            }, function(rejection) {
+              document.getElementById("msg").innerHTML = "Rejection:" + rejection;
+            }).then(function(myJson) {
+              document.getElementById("msg").innerHTML = "Echo response:<br/>"
+                  + JSON.stringify(myJson) + "<br/><br/>" + JSON.stringify(myJson.body);
+            });
+      }
+
+      function getLocation() {
+                document.getElementById("msg").innerHTML = navigator.geolocation;
+        navigator.geolocation.getCurrentPosition((position) => {
+          document.getElementById("msg").innerHTML = position.coords.latitude + ","
+              + position.coords.longitude;
+        }, (err) => {
+          document.getElementById("msg").innerHTML = "error:" + err;
+        }, {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        });
+      }
 
 
-
-function sendGeoInfo() {
-    navigator.geolocation.getCurrentPosition(userAction);
-}
-
-function echo() {
-}
-
-
-
+      async function checkInfection() {
+        let answer = await device.askForInfection();
+        document.getElementById("msg").innerHTML = "Check infection result:" + answer;
+      }
     </script>
   </head>
 
@@ -54,14 +73,25 @@ function echo() {
     Freedom for Spain!
     </p>
     <div id="demo">
+      Device Id <input type="text" id="deviceId" value="111"><br/>
+      Minimum Infection matches <input type="text" id="minMatches" value="2"><br/>
+      Max days to remember<input type="text" id="maxHistory" value="10"><br/>
+      <button onclick="setValues()">Set values</button>
     </div>
-
-    <button onclick="getLocation()">gps</button>
-    <br/>
-    <button onclick="storeLocalChain()">localchain</button>
-    <br/>
+    <div id="msg"> </div>
     <button onclick="sendGeoInfo()">send geolocation</button>
     <br/>
+    <button onclick="checkInfection()">checkForInfection</button>
+    <br/>
+    <br/>
+    Other test functions
+    <br/>
+    <button onclick="getLocation()">get location</button>
+    <br/>
+    <button onclick="showLocalMemory()">show memory</button>
+    <br/>
     <button onclick="echo()">echo test</button>
+    <br/>
+    <button onclick="clearLocalMemory()">clear memory</button>
   </body>
 </html>

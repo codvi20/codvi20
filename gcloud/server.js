@@ -19,6 +19,8 @@ const geoPos = {};
 const infections = [];
 
 
+// JSON Parser, before method definition.
+app.use(bodyParser.json({type: '*/json'}));
 
 // For debuugging
 app.all('/echo', (req, res) => {
@@ -91,7 +93,7 @@ app.post('/infection', (req, res) => {
 
 
 // For notifying of an infection 
-app.get('/notify-infection', (req, res) => {
+app.post('/notify-infection', (req, res) => {
   var hashId = req.param("hashId", null);
   if(hashId==null) {
     res.send("Receive a null in parameter hashId");
@@ -104,7 +106,6 @@ app.get('/notify-infection', (req, res) => {
 
 
 // The server, ready to run
-app.use(bodyParser.json({type: '*/json'}));
 const server = app.listen(8080, () => {
   const host = server.address().address;
   const port = server.address().port;

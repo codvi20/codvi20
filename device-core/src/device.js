@@ -57,6 +57,7 @@ Device.prototype.sendGeoInfo = function() {
         }).then(function(response) {
             return response.json();
         }).then(function(myJson) {
+            console.log(JSON.stringify(myJson));
             that.storeAnswer(myJson.nearIds);
         });
       }
@@ -70,6 +71,7 @@ Device.prototype.sendGeoInfo = function() {
 
 /**
  * Asks to server for infections related to my hashId.
+ * returns: true if it matches with an infection
  */
 Device.prototype.askForInfection = async function() {
     try {
@@ -81,7 +83,6 @@ Device.prototype.askForInfection = async function() {
             body: JSON.stringify({ id: this.getMyId() })
       });
       const myJson = await response.json();
-      
       return this.checkForInfection(myJson.infectedIds, this.MIN_MATCHES);
     } catch(e) {
       //notifyError(e);
@@ -119,18 +120,15 @@ Device.prototype.initMemory = function initMemory() {
  *    maxHistory: limit of time in past in milliseconds from now to preserve
  */
 Device.prototype.clearMemory = function(memory, maxHistory) {
-  try {
-    const miHhistoryTime = Date.now()-maxHistory;
-    for(const x of memory.entries()) {
-      if(x[0] < maxHistory) {
-        memory.delete(x[0]);
-     } else {
-       // Iteration in a map is done in insertion order. See MDN doc.
-        break;
-     }
-    }
-  } catch(e) {
-    return;
+  const miHhistoryTime = Date.now()-maxHistory;
+  if(memory.entries===undefined) return;
+  for(const x of memory.entries()) {
+    if(x[0] < maxHistory) {
+      memory.delete(x[0]);
+   } else {
+     // Iteration in a map is done in insertion order. See MDN doc.
+      break;
+   }
   }
 };
 
@@ -167,6 +165,7 @@ Device.prototype.checkForInfection = function(infectedIds, minMatches) {
   this.clearMemory(memory, this.MAX_HISTORY);
   let matchDone = false;
   let matches = 0;
+  if(memory.entries==undefined) return false;
   outter: for(const arr of memory.entries()) {
     for(const neighbourId of arr[1]) {
       matches += infectedIds.reduce(

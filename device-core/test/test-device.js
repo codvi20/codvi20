@@ -51,16 +51,21 @@ async function fetch(url) {
 //
 // Test cases
 //
-device = require('../src/device.js')(localStorage, geoLocation, fetch);
+//
+Device = require('../src/device.js').Device;
+device = new Device(localStorage, geoLocation, fetch);
+device.setMyId(111);
+device.setMinInfectionMatches(2);
 
 let previousSetItem = memory.setItem;
 memory.setItem = function(x,y) {
   previousSetItem(x,y);
   console.log(memory.getItem("chain"));
 }
-device.sendGeoInfo(111);
-device.sendGeoInfo(111);
-device.sendGeoInfo(111);
+device.sendGeoInfo();
+device.sendGeoInfo();
 
-device.askForInfection(111, 2).then(x => console.log(x));
-device.askForInfection(111, 1).then(x => console.log(x));
+device.askForInfection().then(x => console.log(x)).then(() => {
+device.sendGeoInfo();
+device.askForInfection().then(x => console.log(x));
+});
