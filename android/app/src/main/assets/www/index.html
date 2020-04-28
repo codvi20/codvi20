@@ -24,7 +24,10 @@
         window.localStorage.setItem("chain", "{}");
       }
 
-      function sendGeoInfo() { device.sendGeoInfo(); }
+      function sendGeoInfo() {
+        device.sendGeoInfo();
+        document.getElementById("msg").innerHTML = "Geopos sent";
+      }
 
 
       function echo() {

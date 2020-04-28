@@ -38,7 +38,8 @@ app.get('/info', (req, res) => {
   let msg = '<html><body>Download the apk ';
   msg += '<a href="static/app-debug.apk">here</a>';
   msg += '<br/>Notify an infection for a hashId: ' 
-  msg += '<a href="static/notify-infection.html">here</a>';
+  msg += '<a href="static/notify-infection.html">here</a><br/>';
+  msg += 'Web version <a href="static/index.html">here</a>';
   msg += '</body></html>';
   res.send(msg);
 });

@@ -59,6 +59,7 @@ Device.prototype.sendGeoInfo = function() {
         }).then(function(myJson) {
             console.log(JSON.stringify(myJson));
             that.storeAnswer(myJson.nearIds);
+            console.log("Stored into memory");
         });
       }
   }, (error) => console.log(error), {
@@ -101,7 +102,8 @@ Device.prototype.askForInfection = async function() {
  */
 Device.prototype.initMemory = function() {
   let memory = this.localStorage().getItem("chain");
-  if(memory===undefined) {
+
+  if(memory===undefined || memory===null || JSON.parse(memory)===null) {
     memory = {};
   } else {
     memory = JSON.parse(memory);
