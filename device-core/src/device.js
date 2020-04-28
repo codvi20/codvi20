@@ -19,7 +19,7 @@ var Device = function(localStorage, geoLocation, fetch) {
 /**
  * Set and get my id.
  */
-Device.prototype.setMyId = (myId) => this.MY_ID !== undefined ? this.MY_ID = myId : this.MY_ID;
+Device.prototype.setMyId = (myId) => this.MY_ID = myId;
 Device.prototype.getMyId = () => this.MY_ID;
 
 
@@ -53,7 +53,7 @@ Device.prototype.sendGeoInfo = function() {
             method: 'post',
             headers: { "Content-Type": "text/json" },  
                     // Type application/json does not work in WebView ?
-            body: JSON.stringify({ gps: hashPosition, id: this.getMyId() })
+            body: JSON.stringify({ gps: hashPosition, id: that.getMyId() })
         }).then(function(response) {
             return response.json();
         }).then(function(myJson) {
@@ -99,14 +99,15 @@ Device.prototype.askForInfection = async function() {
 /**
  * Initialize memory and purges old elements.
  */
-Device.prototype.initMemory = function initMemory() {
+Device.prototype.initMemory = function() {
   let memory = this.localStorage().getItem("chain");
   if(memory===undefined) {
-    memory = new Map();
+    memory = {};
   } else {
+    memory = JSON.parse(memory);
     this.clearMemory(memory, this.MAX_HISTORY);
   }
-  this.localStorage().setItem("chain", memory);
+  this.localStorage().setItem("chain", JSON.stringify(memory));
 };
 
 
@@ -121,14 +122,10 @@ Device.prototype.initMemory = function initMemory() {
  */
 Device.prototype.clearMemory = function(memory, maxHistory) {
   const miHhistoryTime = Date.now()-maxHistory;
-  if(memory.entries===undefined) return;
-  for(const x of memory.entries()) {
-    if(x[0] < maxHistory) {
-      memory.delete(x[0]);
-   } else {
-     // Iteration in a map is done in insertion order. See MDN doc.
-      break;
-   }
+  for(const x in memory) {
+    if(x < maxHistory) {
+      delete memory[x];
+    }
   }
 };
 
@@ -142,15 +139,17 @@ Device.prototype.clearMemory = function(memory, maxHistory) {
  */
 Device.prototype.storeAnswer =  function(nearIds) {
   // Filter yourself, the server does not do it (or maybe yes, but who knows)
+  const that = this;
   let v = nearIds.filter(info => 
-      info.id !== this.getMyId()).map(info => info.id);
+      info.id !== that.getMyId()).map(info => info.id);
 
   if(v.length > 0) {
-    let memory = this.localStorage().getItem("chain");
+    let memory = JSON.parse(this.localStorage().getItem("chain"));
     this.clearMemory(memory, this.MAX_HISTORY);
-    memory.set(Date.now(),  v);
-    this.localStorage().setItem("chain", memory);
+    memory[Date.now()] = v;
+    this.localStorage().setItem("chain", JSON.stringify(memory));
   }
+  console.log(this.localStorage().getItem("chain"));
 }
 
 
@@ -161,13 +160,12 @@ Device.prototype.storeAnswer =  function(nearIds) {
  *    minMatches : minimum of matches with an infected id to consider a match.
  */
 Device.prototype.checkForInfection = function(infectedIds, minMatches) {
-  let memory = this.localStorage().getItem("chain");
+  let memory = JSON.parse(this.localStorage().getItem("chain"));
   this.clearMemory(memory, this.MAX_HISTORY);
   let matchDone = false;
   let matches = 0;
-  if(memory.entries==undefined) return false;
-  outter: for(const arr of memory.entries()) {
-    for(const neighbourId of arr[1]) {
+  outter: for(const arr in memory) {
+    for(const neighbourId of memory[arr]) {
       matches += infectedIds.reduce(
             (accum, id) => accum += id===neighbourId ? 1 : 0, 0);
       if(matches>minMatches) {

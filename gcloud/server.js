@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 
 
 // Milliseconds to keep in memory ids in the same geoposition
-const LAPSE = 10000; // 10 seconds. Why? Because there are 10 types of
+const LAPSE = 60000; // 60 seconds. Why? Because there are 10 types of
                      // humans: those who know binary and those who don't
 //
 const INFECTION_MEMORY = 5 * 3600 * 24;  // 5 days of memory of an infection
@@ -21,6 +21,7 @@ const infections = [];
 
 // JSON Parser, before method definition.
 app.use(bodyParser.json({type: '*/json'}));
+app.use(bodyParser.urlencoded());
 
 // For debuugging
 app.all('/echo', (req, res) => {
@@ -84,7 +85,7 @@ app.post('/infection', (req, res) => {
     if(infections[i][0] < minTime) {
       infections.splice(i, 1);
     } else {
-      hashInfectedIdsArray.append(infections[i][1]);
+      hashInfectedIdsArray.push(infections[i][1]);
     }
   }
 
@@ -94,7 +95,7 @@ app.post('/infection', (req, res) => {
 
 // For notifying of an infection 
 app.post('/notify-infection', (req, res) => {
-  var hashId = req.param("hashId", null);
+  var hashId = req.body["hashId"];
   if(hashId==null) {
     res.send("Receive a null in parameter hashId");
   } else {

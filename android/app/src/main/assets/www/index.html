@@ -18,14 +18,10 @@
 
       function showLocalMemory() {
         document.getElementById("msg").innerHTML = window.localStorage.getItem("chain");
-        for(x in window.localStorage.getItem("chain").elements()) {
-          document.getElementById("msg").innerHTML += "<br/>" + x[0] + "," + x[1];
-        }
-        docuemnt.getElementById("msg").innerHTML += "<br/>thats all";
       }
 
       function clearLocalMemory() {
-        window.localStorage.setItem("chain", new Map());
+        window.localStorage.setItem("chain", "{}");
       }
 
       function sendGeoInfo() { device.sendGeoInfo(); }
