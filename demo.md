@@ -17,6 +17,11 @@ Of the device 111
 As it was close to the other device.
 ![Infection report](doc/20200429_185118.jpg)
 
+## Notes
 So simple.
+
 No info is stored in servers. There is only info of matching ids inside
 the devices.
+
+Yo see a lot of buttons: because it's a PROTOTYPE and all the functionallity
+is open to be controled by user. No timers at this moment.
