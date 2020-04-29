@@ -24,4 +24,4 @@ No info is stored in servers. There is only info of matching ids inside
 the devices.
 
 Yo see a lot of buttons: because it's a PROTOTYPE and all the functionallity
-is open to be controled by user. No timers at this moment.
+is open to be controlled by user. No timers at this moment.
