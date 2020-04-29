@@ -13,7 +13,7 @@ With id=333 and location shown in the picture (close to the other one).
 Of the device 111
 ![Infection report](doc/20200429_185053.jpg)
 
-## Second devide reports risk
+## Second device reports risk to user
 As it was close to the other device.
 ![Infection report](doc/20200429_185118.jpg)
 
