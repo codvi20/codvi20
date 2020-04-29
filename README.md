@@ -10,12 +10,19 @@ Principal focus of the proposed solution are:
 
 # License
 
-This is an open project.
+This is an open source project, free-libre.
 You can copy, distribute, use to inspirate your own creation, implement
 or do whatever you want with the information here contained, with 
 ONLY TWO CONDITIONS: 
   1. you need to make an explicit reference to this project and the authors.
   2. you have to create a pull request in which you identify yourself with your email and name of your project in a clear way in the file "associated-projects.txt"
+
+# Technical and non technical aspects
+Open technical questions technical
+Open mathematical questions
+Open social questions
+Video of the prototipe
+
 
 # Brief description
 The user has an instance of the app in their device.
