@@ -18,11 +18,16 @@ ONLY TWO CONDITIONS:
   2. you have to create a pull request in which you identify yourself with your email and name of your project in a clear way in the file "associated-projects.txt"
 
 # Technical and non technical aspects
-Open technical questions technical
-Open mathematical questions
-Open social questions
-Video of the prototipe
 
+This prototype opens a list of questions, not all technical, but mathematical
+and social. Check out them:
+  1. Open [technical](open-technical-questions.md) questions technical
+  1. Open [mathematical](open-mathematical-questions.md) questions
+  1. Open [social](open-social-questions.md) question
+
+# Other similar projects
+We've found similar projects:
+  1. [DP^3T](
 
 # Brief description
 The user has an instance of the app in their device.
