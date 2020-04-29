@@ -27,7 +27,7 @@ and social. Check out them:
 
 # Other similar projects
 We've found similar projects:
-  1. [DP^3T](
+  1. [DP 3T](https://github.com/DP-3T)
 
 # Brief description
 The user has an instance of the app in their device.
