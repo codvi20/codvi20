@@ -14,4 +14,8 @@ S seconds or more together,
   - which should be the acceptable frequency of notification for the devices?
   - and the storage time of the positions in server
 
+## And what if there is no GPS?
+It will not detect the position and nothing can be notified.
+Maybe it's good at this moment to scan for bluetooth near devices and store
+them as it's done with the answer from servers.
 
