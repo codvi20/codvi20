@@ -30,7 +30,7 @@ app.all('/echo', (req, res) => {
 
 // For justice and freedom
 app.get('/help', (req, res) => {
-  res.send('Freedom in Spain now! "Confinement" Confinement is not an ilegal massive house arrest and policial cup d\'etat');
+  res.send('Freedom in Spain now!');
 });
 
 // For telling you the instructions
