@@ -19,3 +19,10 @@ It will not detect the position and nothing can be notified.
 Maybe it's good at this moment to scan for bluetooth near devices and store
 them as it's done with the answer from servers.
 
+## Please change SHA1 by something more secure
+Of course, at least SHA256.
+The number of different GPS positions with a resolution of 4 meters in a
+country like Spain is about a rectangule of 6 degress by 7 degrees (and
+each degree is about 111111 meters) is about 32,407,342,592
+Think if it's big enough to ensure a good spreadding (and no collision expected
+for a 2^256 space).
