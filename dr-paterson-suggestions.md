@@ -16,7 +16,7 @@ smaller than JSON, the device might send and receive in each connection about
 
 
 ## Battery consumption
-It seems G4 connections are more expensive in terms of battery than Low
+It seems 4G/3G connections are more expensive in terms of battery than Low
 energy Usage BT connections (the other approach to detect proximity).
 
 
@@ -32,10 +32,13 @@ to track specially.
 
 ### A solution? No
 
-Let's suppose there exists:
+Let's suppose there exist:
 
 1. A function `a(x)` that, for a given device `A` chypers the position `x`
-1. A function `f(A,B)(a(x),b(y))` that gives 1 if `x==y` and 0 otherwise
+1. A function `f(A,B)(z,t)` for a device `A` with a cypher function `a`, 
+and a device `B` with a cyhper funcion `b`. `a` and `b` unknown.
+`f(A,B)(z,t)=1` if there are a position `x`, verifying
+`a(x)=z` and `b(x)=t`, and `0` otherwise.
 
 Under this circumstances, if I know `f(A,B)`, and `b`, I can for each 
 `z=a(x)` given discover the real value of `x`, just mapping all posible
@@ -45,20 +48,3 @@ The sooner this function is `1` for a `y`, the original position for A is `y`.
 So no guarantee on confidentiallity for device position is feasible
 if there is a third point that checks if two position matches.
 
-
-Instead of sending the GPS hashed, might be better to send it to the power
-of the hashed device Id.
-Then the server will match the position received by device A 
-with received from device B if:
-
-messageFromA ^ idB == messageFromB ^ idA
-
-as
-
-messageFromA = hashedGPS ^ idA
-
-But it's not a solution: if we store all the messages sent by idA, we can
-calculate we're she was.
-No matter if we add something that changes during time; it's just a question
-of time and memory to calculate the values.
-Everything modulus a agreed number. 

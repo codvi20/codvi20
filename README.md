@@ -21,6 +21,8 @@ ONLY TWO CONDITIONS:
 
 This prototype opens a list of questions, not all technical, but mathematical
 and social. Check out them:
+  1. The most important thing, objections from Dr. Kenneth Paterson
+[here](dr-paterson-suggestions.md).
   1. Open [technical](open-technical-questions.md) questions technical
   1. Open [mathematical](open-mathematical-questions.md) questions
   1. Open [social](open-social-questions.md) question
